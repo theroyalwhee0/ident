@@ -1,0 +1,38 @@
+{
+  "name": "ident",
+  "version": "0.0.1",
+  "description": "Unique Identity Generator",
+  "main": "src/index.js",
+  "author": "Adam Mill <theroyalwhee0@gmail.com>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "ident",
+    "identifier"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theroyalwhee0/ident.git"
+  },
+  "bugs": {
+    "url": "https://github.com/theroyalwhee0/ident/issues"
+  },
+  "homepage": "https://github.com/theroyalwhee0/ident#readme",
+  "scripts": {
+    "test": "ava",
+    "test-watch": "ava --watch",
+    "lint": "eslint \"${npm_package_main}\" || true",
+    "lint-tests": "eslint \"${npm_package_directories_test}\" || true"
+  },
+  "dependencies": {
+    "@theroyalwhee0/hrdate": "^0.0.2"
+  },
+  "devDependencies": {
+    "ava": "^0.17.0",
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb-base": "^11.0.1",
+    "eslint-plugin-import": "^2.2.0"
+  }
+}
