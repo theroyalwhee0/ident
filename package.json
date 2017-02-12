@@ -1,5 +1,5 @@
 {
-  "name": "ident",
+  "name": "@theroyalwhee0/ident",
   "version": "0.0.1",
   "description": "Unique Identity Generator",
   "main": "src/index.js",

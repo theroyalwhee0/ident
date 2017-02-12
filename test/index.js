@@ -1,7 +1,6 @@
 /**
  * ident:test/index.js
  */
-'use strict';
 
 /**
  * Imports.
@@ -15,11 +14,6 @@ const {
     packValues,
     encryptValues,
   } = require('../src');
-
-/**
- * Number Size Constants.
- */
-const SIZE_UINT32 = 4;
 
 /**
  * Number Values Constants.
@@ -61,7 +55,7 @@ test('bytesToUInt32: should return value for a UInt32', (check) => {
 });
 test('bytesToUInt32: should throw if numeric value is out of range', (check) => {
   const error = check.throws(() => {
-      bytesToUInt32(-8484);
+    bytesToUInt32(-8484);
   });
   check.is(error.message, 'number "value" should must be a UInt32');
 });
@@ -77,7 +71,7 @@ test('bytesToUInt32: should return value for a padded character string', (check)
 });
 test('bytesToUInt32: should throw if string value is out of range', (check) => {
   const error = check.throws(() => {
-      bytesToUInt32('thisistoolong');
+    bytesToUInt32('thisistoolong');
   });
   check.is(error.message, 'string "value" should be 1 to 4 ASCII characters');
 });
@@ -162,15 +156,15 @@ test('counterFactory: counter() should increment on each call', (check) => {
   check.is(results3, 1003);
 });
 test('counterFactory: counter() should wrap around', (check) => {
-  const counter = counterFactory({ initialCounter: MAX_UINT32-2 });
+  const counter = counterFactory({ initialCounter: MAX_UINT32 - 2 });
   const results1 = counter();
-  check.is(results1, MAX_UINT32-1);
+  check.is(results1, MAX_UINT32 - 1);
   const results2 = counter();
   check.is(results2, MAX_UINT32);
   const results3 = counter();
   check.is(results3, MIN_UINT32);
   const results4 = counter();
-  check.is(results4, MIN_UINT32+1);
+  check.is(results4, MIN_UINT32 + 1);
 });
 
 /**
