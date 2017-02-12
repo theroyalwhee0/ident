@@ -27,7 +27,7 @@
     "lint-tests": "eslint \"${npm_package_directories_test}\" || true"
   },
   "dependencies": {
-    "@theroyalwhee0/hrdate": "^0.0.2"
+    "@theroyalwhee0/hrdate": "^0.0.4"
   },
   "devDependencies": {
     "ava": "^0.17.0",

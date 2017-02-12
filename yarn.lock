@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@theroyalwhee0/hrdate@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@theroyalwhee0/hrdate/-/hrdate-0.0.2.tgz#8732a50aec6b6941c5744a101d0b056669ea81ac"
+"@theroyalwhee0/hrdate@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@theroyalwhee0/hrdate/-/hrdate-0.0.4.tgz#89e3b9f1e66d24c91499634c1fec4de35035a61d"
 
 abbrev@1:
   version "1.0.9"
