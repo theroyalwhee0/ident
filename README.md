@@ -1,6 +1,7 @@
 # ident
 ## A Unique Identity Generator for Node
 Generates unique non-predictable collision-resistant identifiers using an encrypted combination of randomness, counter, time stamp, and names.
+Identities should be random looking base64 strings similar to 'rqhk9abA3U5DE4txTXwokDsiAd1mT/BXt1lvsA'.
 
 ## Example:
 ```
