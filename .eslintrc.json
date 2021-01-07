@@ -1,0 +1,98 @@
+{
+    "env": {
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "indent": [
+            "error",
+            2,
+            { "SwitchCase": 1 }
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "array-bracket-spacing": [
+            "error",
+            "always",
+            {
+                "objectsInArrays": false,
+                "arraysInArrays": false,
+                "singleValue": false
+            }
+        ],
+        "brace-style": [
+            "error",
+            "1tbs"
+        ],
+        "comma-dangle": [
+            "error",
+            {
+                "objects": "always-multiline",
+                "arrays": "always-multiline"
+            }
+        ],
+        "comma-spacing": [
+            "error",
+            {
+                "after": true,
+                "before": false
+            }
+        ],
+        "func-call-spacing": [
+            "error",
+            "never"
+        ],
+        "keyword-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true,
+                "overrides": {
+                    "if": { "after": false },
+                    "for": { "after": false },
+                    "while": { "after": false },
+                    "catch": { "after": false },
+                    "function": { "after": false }
+                }
+            }
+        ],
+        "no-trailing-spaces": [
+            "error",
+            { "skipBlankLines": true }
+        ],
+        "object-curly-spacing": [
+            "error",
+            "always"
+        ],
+        "arrow-parens": [
+            "error",
+            "always"
+        ],
+        "eol-last": [
+            "error",
+            "always"
+        ]
+    }
+}

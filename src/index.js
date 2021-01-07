@@ -1,165 +1,188 @@
 /**
- * ident:src/index.js
+ * @theroyalwhee0/ident:src/index.js
  */
 
 /**
  * Imports.
  */
 const crypto = require('crypto');
-const { hrDate } = require('@theroyalwhee0/hrdate');
+const { isString } = require('@theroyalwhee0/istype');
+const { idSequence, explode } = require('@theroyalwhee0/snowman');
+const { decodeBin, encodeBin } = require('@base32h/base32h');
+const {
+  HMAC_ALGO,
+  ALL_SIZE, ID_SIZE, RND_SIZE, VERIFY_SIZE, SIGN_SIZE,
+  re_lax,
+} = require('./constants');
 
 /**
- * Number Size Constants.
+ * Default Options.
  */
-const SIZE_UINT32 = 4;
+const defaultOptions = {
+  getRandomBytes: (size) => crypto.randomBytes(size),
+};
 
 /**
- * Number Range Constants.
+ * Build options from options and defaults.
+ * @param {object} options
  */
-const MIN_UINT32 = 0;
-const MAX_UINT32 = 2 ** 32;
-
-/**
- * Crypto Constants.
- */
-const IVPARTIALSIZE = 4;
-const IVFULLSIZE = 16;
-const SIGNATURESIZE = 4;
-const ALGORITHM = 'aes-256-ctr';
-
-/**
- * Generate a random unsigned 32 bit integer.
- * @return {Number} The random UInt32.
- */
-function randomUInt32() {
-  // NOTE: It does not matter which endian is used, it is all random.
-  return crypto.randomBytes(SIZE_UINT32).readUInt32BE(0);
+function buildOptions(options) {
+  const built = Object.assign({}, defaultOptions, options);
+  const idOptions = Object.assign({}, built.idOptions);
+  built.idOptions = idOptions;
+  if('node' in built) {
+    idOptions.node = built.node;
+  }
+  return built;
 }
 
 /**
- * Counter factory.
- * @param  {Object} options Options.
- * @return {Function}         A counter function that increments a value and
- * returns it, wrapping around when appropriate.
+ * identGenerator
  */
-function counterFactory(options) {
-  let value = options && options.initialCounter ? options.initialCounter : randomUInt32();
-  return function counter() {
-    value += 1;
-    if (value > MAX_UINT32) {
-      value = MIN_UINT32;
+function* identGenerator(options) {
+  options = buildOptions(options);
+  const { verifyKey, signKey, getRandomBytes } = options;
+  const ids = idSequence(options.idOptions);
+  while(1) {
+    // Create the buffer.
+    const buffer = Buffer.alloc(ALL_SIZE, 0);
+    // Add the id.
+    const { value: id, done } = ids.next();
+    if(done) {
+      throw new Error(`id sequence should never be done.`);
     }
-    return value;
+    buffer.writeBigUInt64BE(id, 0);
+    // Add the random bytes.
+    const rnd = getRandomBytes(RND_SIZE);
+    rnd.copy(buffer, ID_SIZE, 0, RND_SIZE);
+    // Add verification hmac.
+    const verifyBuffer = buffer.slice(0, ID_SIZE+RND_SIZE);
+    const hmacVerify = crypto.createHmac(HMAC_ALGO, verifyKey);
+    const verify = hmacVerify.update(verifyBuffer).digest();
+    verify.copy(buffer, ID_SIZE+RND_SIZE, 0, VERIFY_SIZE);
+    // Add signature hmac.
+    const signBuffer = buffer.slice(0, ID_SIZE+RND_SIZE+VERIFY_SIZE);
+    const hmacSign = crypto.createHmac(HMAC_ALGO, signKey);
+    const sign = hmacSign.update(signBuffer).digest();
+    sign.copy(buffer, ID_SIZE+RND_SIZE+VERIFY_SIZE, 0, SIGN_SIZE);
+    // Encode buffer and strip leading zeros.
+    const ident = encodeBin(buffer).replace(/^0+/, '');
+    yield ident;
+  }
+}
+
+/**
+ * Left trim buffer.
+ */
+function leftTrimBuffer(buffer, byte=0) {
+  let idx;
+  for(idx=0; idx < buffer.length; idx++) {
+    if(buffer[idx] !== byte) {
+      break;
+    }
+  }
+  return idx === 0 ? buffer : buffer.slice(idx);
+}
+
+/**
+ * Validation factory.
+ * @param {object} options Options.
+ * @returns True if valid, false if not.
+ */
+function validationFactory(options) {
+  options = buildOptions(options);
+  const { verifyKey, signKey } = options;
+  return function validation(value) {
+    if(!isString(value) || !re_lax.test(value)) {
+      return false;
+    }
+    const decoded = leftTrimBuffer(Buffer.from(decodeBin(value)));
+    const buffer = decoded.length < ALL_SIZE ?
+      Buffer.concat([ Buffer.alloc(ALL_SIZE-decoded.length, 0), decoded ])
+      : decoded;
+    if(buffer.length !== ALL_SIZE) {
+      return false;
+    }
+    let start = 0, end = ID_SIZE;
+    const id = buffer.readBigUInt64BE();
+    // Check ID.
+    const [ ,,, idValid ] = explode(id);
+    if(!idValid) {
+      return false;
+    }
+    start = end; end += RND_SIZE;
+    start = end; end += VERIFY_SIZE;
+    const verify = buffer.slice(start, end);
+    start = end; end += SIGN_SIZE;
+    const sign = buffer.slice(start, end);
+    if(verifyKey) {
+      // Check verify hmac if given verify key...
+      const hmacVerify = crypto.createHmac(HMAC_ALGO, verifyKey);
+      const verifyBuffer = buffer.slice(0, ID_SIZE+RND_SIZE);
+      const verifyCheck = hmacVerify.update(verifyBuffer).digest().slice(0, VERIFY_SIZE);
+      if(!crypto.timingSafeEqual(verify, verifyCheck)) {
+        return false;
+      }
+    }
+    if(signKey) {
+      // Check sign hmac if given sign key...
+      const hmacSign = crypto.createHmac(HMAC_ALGO, signKey);
+      const signBuffer = buffer.slice(0, ID_SIZE+RND_SIZE+VERIFY_SIZE);
+      const signCheck = hmacSign.update(signBuffer).digest().slice(0, SIGN_SIZE);
+      if(!crypto.timingSafeEqual(sign, signCheck)) {
+        return false;
+      }
+    }
+    return true;
   };
 }
 
 /**
- * Convert bytes to a uint32.
- * @param  {String|Number|Undefined} value        The value to convert. May be a
- * UInt32, a ASCII string of 1 to 4 characters, or undefined.
- * @param  {Number|Undefined} defaultValue The value to return if no value was given.
- * @return {Number}              The UInt32 value.
+ * Validation factory requring a signKey.
+ * @param {object} options Options.
+ * @returns True if valid, false if not.
  */
-function bytesToUInt32(value, defaultValue) {
-  if (value === undefined) {
-    return defaultValue || 0;
-  } else if (typeof value === 'string') {
-    if (/^[\0-\x7F]{1,4}$/.test(value)) {
-      const padded = `${value}\0\0\0\0`.substring(0, 4);
-      /* eslint-disable no-bitwise */
-      const output = padded.codePointAt(3)
-        | (padded.codePointAt(2) << 8)
-        | (padded.codePointAt(1) << 16)
-        | (padded.codePointAt(0) << 24);
-      /* eslint-enable no-bitwise */
-      return output;
-    }
-    throw new Error('string "value" should be 1 to 4 ASCII characters');
-  } else if (typeof value === 'number') {
-    if (value >= MIN_UINT32 && value <= MAX_UINT32 && value === Math.floor(value)) {
-      return value;
-    }
-    throw new Error('number "value" should must be a UInt32');
+function validationSignFactory(options) {
+  if(!(options && options.signKey)) {
+    throw new Error('signKey is required.');
   }
-  throw new Error('"value" expected to be string, undefined, or number');
+  return validationFactory(options);
 }
 
 /**
- * Pack a list of UInt32s into a buffer.
- * @param  {Array<Number>} values List of UInt32s.
- * @return {Buffer}        The buffer.
+ * Validation factory requring a verifyKey.
+ * @param {object} options Options.
+ * @returns True if valid, false if not.
  */
-function packValues(values) {
-  const buffer = new Buffer(values.length * 4).fill(0);
-  for (let idx = 0; idx < values.length; idx += 1) {
-    const value = values[idx];
-    buffer.writeUInt32BE(value, idx * 4);
+function validationVerifyFactory(options) {
+  if(!(options && options.verifyKey)) {
+    throw new Error('verifyKey is required.');
   }
-  return buffer;
+  return validationFactory(options);
 }
 
 /**
- * Encrypt and sign the values with the key.
- * @param  {[Buffer} encryptionKey Buffer with the encryption key in it.
- * @param  {Buffer} signatureKey  Buffer with the signature key in it.
- * @param  {Buffer} ivKey  Buffer with the IV key in it.
- * @param  {Buffer} buffer         The input data to encrypt.
- * @return {Buffer}               The encrypted buffer.
+ * Validation factory requring both keys.
+ * @param {object} options Options.
+ * @returns True if valid, false if not.
  */
-function encryptValues(encryptionKey, signatureKey, ivKey, buffer) {
-  const ivPartial = crypto.randomBytes(IVPARTIALSIZE);
-  const iv = crypto.createHmac('sha256', ivKey)
-    .update(ivPartial)
-    .digest()
-    .slice(0, IVFULLSIZE);
-  const cipher = crypto.createCipheriv(ALGORITHM, encryptionKey, iv);
-  const encrypted = Buffer.concat([
-    cipher.update(buffer),
-    cipher.final(),
-  ]);
-  const signaturePartial = crypto.createHmac('sha256', signatureKey)
-    .update(ivPartial)
-    .update(encrypted)
-    .digest()
-    .slice(0, SIGNATURESIZE);
-  const combined = Buffer.concat([
-    ivPartial,
-    signaturePartial,
-    encrypted,
-  ]);
-  return combined;
-}
-
-/**
- * Identity factory.
- * @param  {Object} options Options for identity.
- * @return {Function}      The new identity builder.
- */
-function identFactory(options) {
-  const encryptionKey = options.encryptionKey;
-  const signatureKey = options.signatureKey;
-  const ivKey = options.ivKey;
-  const name = bytesToUInt32(options && options.name);
-  const instance = bytesToUInt32(options && options.instance);
-  const counter = counterFactory(options);
-  return () => {
-    const count = counter();
-    const [second, nanosecond] = hrDate();
-    const packed = packValues([nanosecond, name, instance, count, second]);
-    const encrypted = encryptValues(encryptionKey, signatureKey, ivKey, packed);
-    return encrypted.toString('base64').replace(/=+$/, '');
-  };
+function validationBothFactory(options) {
+  if(!(options && options.signKey)) {
+    throw new Error('signKey is required.');
+  }
+  if(!(options && options.verifyKey)) {
+    throw new Error('verifyKey is required.');
+  }
+  return validationFactory(options);
 }
 
 /**
  * Exports.
  */
 module.exports = {
-  // Library.
-  identFactory,
-  // Internal Utilities, may change between versions.
-  counterFactory,
-  bytesToUInt32,
-  packValues,
-  encryptValues,
+  identGenerator,
+  validationFactory,
+  validationSignFactory,
+  validationVerifyFactory,
+  validationBothFactory,
 };

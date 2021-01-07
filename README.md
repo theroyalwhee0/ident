@@ -1,22 +1,57 @@
-# ident
-## A Unique Identity Generator for Node
-Generates unique non-predictable collision-resistant identifiers using an encrypted combination of randomness, counter, time stamp, and names.
-Identities will be random-looking base64 strings similar to 'rqhk9abA3U5DE4txTXwokDsiAd1mT/BXt1lvsA'.
+# @theroyalwhee0/ident
 
-## Example:
+## A Unique Identity/Token Generator for Node
+Generates unique non-predictable collision-resistant identifiers.
+It is built from a combination of a [snowflake id](https://github.com/theroyalwhee0/snowman), random bytes, and two partial HMACs.
+
+
+## Installation
+npm install @theroyalwhee0/ident
+
+*or*
+
+yarn add @theroyalwhee0/ident
+
+
+## Documentation
+The identGenerator function creates a iterable sequence of tokens. The verify*Factory functions verify a given token's structure and check the partial HMAC values.
+
+
+## Usage
 ```
-const { identFactory } = require('@theroyalwhee0/ident');
-const getIdent = identFactory({
-    name: 'www',
-    instance: '1',
-    encryptionKey: Buffer.from('wdIWvR5A3TDPYUajuVveoNSGhb40Dng4'),
-    signatureKey: Buffer.from('rn7jDzzAhOcgHR9giWSLwbSFLW0N27ad'),
-    ivKey: Buffer.from('oPTZXD6LN4EBUzM/7asvD6Sr40v7EceG'),
+const { identGenerator, validationBothFactory } = require('@theroyalwhee0/ident');
+const verifyKey = 'orange';
+const signKey = 'sherbert';
+const idents = identGenerator({
+    node: 1,
+    verifyKey, signKey,
   });
-const ident1 = getIdent();
-const ident2 = getIdent();
+const validate = validationBothFactory({
+    node: 1,
+    verifyKey, signKey,
+  });
+const { value: ident1 } = idents.next();
+const { value: ident2 } = idents.next();
 console.log(`${ident1}, ${ident2}`);
+console.log(`${validate(ident1)}, ${validate(ident2)}`);
 ```
+
+## Testing.
+Running ```npm run test``` will run the test suite under Mocha. Running ```npm run test-watch``` will run the test suite in watch mode.
+
+
+## Links
+- GitHub: https://github.com/theroyalwhee0/ident
+- NPM: https://www.npmjs.com/package/@theroyalwhee0/ident
+
 
 ## History
- - 0.0.1 Initial version.
+- 2021-01-07 v1.0.0 Initial release of v1 library.
+
+ Previous versions are a different unsupported library that shares the same name.
+
+
+## Legal & License
+Copyright 2020-2021 Adam Mill
+
+The library is released under Apache 2 license.  See LICENSE for more details.

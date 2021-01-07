@@ -1,11 +1,1 @@
-# Node files.
 node_modules/
-npm-debug.log
-
-# Mercurial files.
-.hg/
-.hgignore
-.hgsigs
-.hgsub
-.hgsubstate
-.hgtags

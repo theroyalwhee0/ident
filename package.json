@@ -1,11 +1,12 @@
 {
   "name": "@theroyalwhee0/ident",
-  "version": "0.0.1",
-  "description": "Unique Identity Generator",
+  "version": "1.0.0",
+  "description": "Unique Identity/Token Generator",
   "main": "src/index.js",
   "author": "Adam Mill <theroyalwhee0@gmail.com>",
   "license": "Apache-2.0",
   "keywords": [
+    "token",
     "ident",
     "identifier"
   ],
@@ -20,19 +21,20 @@
     "url": "https://github.com/theroyalwhee0/ident/issues"
   },
   "homepage": "https://github.com/theroyalwhee0/ident#readme",
-  "scripts": {
-    "test": "ava",
-    "test-watch": "ava --watch",
-    "lint": "eslint \"${npm_package_main}\" || true",
-    "lint-tests": "eslint \"${npm_package_directories_test}\" || true"
+  "devDependencies": {
+    "chai": "4.2.0",
+    "debug": "4.3.1",
+    "eslint": "7.17.0",
+    "mocha": "8.2.1",
+    "sinon": "9.2.2"
   },
   "dependencies": {
-    "@theroyalwhee0/hrdate": "^0.0.4"
+    "@base32h/base32h": "1.0.1",
+    "@theroyalwhee0/snowman": "0.0.1"
   },
-  "devDependencies": {
-    "ava": "^0.17.0",
-    "eslint": "^3.15.0",
-    "eslint-config-airbnb-base": "^11.0.1",
-    "eslint-plugin-import": "^2.2.0"
+  "scripts": {
+    "test": "mocha --sort --recursive --check-leaks",
+    "test-watch": "mocha --watch --reporter=dot --sort --recursive --check-leaks",
+    "lint": "eslint src/**/*.js test/**/*.js"
   }
 }
