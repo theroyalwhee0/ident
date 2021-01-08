@@ -14,7 +14,7 @@ yarn add @theroyalwhee0/ident
 
 
 ## Documentation
-The identGenerator function creates a iterable sequence of tokens. The verify*Factory functions verify a given token's structure and check the partial HMAC values.
+The identGenerator function creates a iterable sequence of tokens. The validation*Factory functions validates a given token's structure and check the partial HMAC values.
 
 
 ## Usage
