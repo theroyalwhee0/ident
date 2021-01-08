@@ -2,7 +2,7 @@
 
 ## A Unique Identity/Token Generator for Node
 Generates unique non-predictable collision-resistant identifiers.
-It is built from a combination of a [snowflake id](https://github.com/theroyalwhee0/snowman), random bytes, and two partial HMACs.
+It is built from a combination of a [snowflake ID](https://github.com/theroyalwhee0/snowman), random bytes, and two partial HMACs.
 
 
 ## Installation
@@ -20,14 +20,13 @@ The identGenerator function creates a iterable sequence of tokens. The verify*Fa
 ## Usage
 ```
 const { identGenerator, validationBothFactory } = require('@theroyalwhee0/ident');
-const verifyKey = 'orange';
-const signKey = 'sherbert';
+const verifyKey = 'bird';
+const signKey = 'seed';
 const idents = identGenerator({
     node: 1,
     verifyKey, signKey,
   });
 const validate = validationBothFactory({
-    node: 1,
     verifyKey, signKey,
   });
 const { value: ident1 } = idents.next();
