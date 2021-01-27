@@ -35,6 +35,6 @@
   "scripts": {
     "test": "mocha --sort --recursive --check-leaks",
     "test-watch": "mocha --watch --reporter=dot --sort --recursive --check-leaks",
-    "lint": "eslint src/**/*.js test/**/*.js"
+    "lint": "eslint src/ test/"
   }
 }
