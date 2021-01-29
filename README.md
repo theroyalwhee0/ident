@@ -45,7 +45,10 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## History
-- 2021-01-07 v1.0.0 Initial release of v1 library.
+- 2021-01-29 - v1.0.1
+  - Upgrade to latest version of [@theroyalwhee0/snowman](https://www.npmjs.com/package/@theroyalwhee0/snowman)
+- 2021-01-07 - v1.0.0
+  - Initial release of v1 library.
 
  Previous versions are a different unsupported library that shares the same name.
 
@@ -53,4 +56,4 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 ## Legal & License
 Copyright 2020-2021 Adam Mill
 
-The library is released under Apache 2 license.  See LICENSE for more details.
+This library is released under Apache 2 license. See [LICENSE](https://github.com/theroyalwhee0/ident/blob/master/LICENSE) for more details.

@@ -1,9 +1,9 @@
 {
   "name": "@theroyalwhee0/ident",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unique Identity/Token Generator",
   "main": "src/index.js",
-  "author": "Adam Mill <theroyalwhee0@gmail.com>",
+  "author": "Adam Mill <hismajesty@theroyalwhee.com>",
   "license": "Apache-2.0",
   "keywords": [
     "token",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@base32h/base32h": "1.0.1",
-    "@theroyalwhee0/snowman": "0.0.1"
+    "@theroyalwhee0/snowman": "0.0.3"
   },
   "scripts": {
     "test": "mocha --sort --recursive --check-leaks",
