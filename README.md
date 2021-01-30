@@ -45,9 +45,9 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## History
-- 2021-01-29 - v1.0.1
+- v1.0.1 - 2021-01-29
   - Upgrade to latest version of [@theroyalwhee0/snowman](https://www.npmjs.com/package/@theroyalwhee0/snowman)
-- 2021-01-07 - v1.0.0
+- v1.0.0 - 2021-01-07
   - Initial release of v1 library.
 
  Previous versions are a different unsupported library that shares the same name.
