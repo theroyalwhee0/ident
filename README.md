@@ -2,7 +2,7 @@
 
 ## A Unique Identity/Token Generator for Node
 Generates unique non-predictable collision-resistant identifiers.
-It is built from a combination of a [snowflake ID](https://github.com/theroyalwhee0/snowman), random bytes, and two partial HMACs.
+It is built from a combination of a [snowflake ID](https://github.com/theroyalwhee0/snowman), random bytes, and two partial HMACs. It is encoded using [base32h](https://base32h.github.io).
 
 
 ## Installation
@@ -14,7 +14,7 @@ yarn add @theroyalwhee0/ident
 
 
 ## Documentation
-The identGenerator function creates a iterable sequence of tokens. The validation*Factory functions validates a given token's structure and check the partial HMAC values.
+The identGenerator() function creates a iterable sequence of tokens. The validation*Factory() functions validates a given token's structure and check the partial HMAC values.
 
 
 ## Usage
@@ -45,6 +45,10 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## History
+- v1.0.2 - 2021-02-04
+  - Add documentation.
+  - Upgrade depends, fix deprecated references.
+  - Remove unused dev depends.
 - v1.0.1 - 2021-01-29
   - Upgrade to latest version of [@theroyalwhee0/snowman](https://www.npmjs.com/package/@theroyalwhee0/snowman)
 - v1.0.0 - 2021-01-07

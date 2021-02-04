@@ -7,7 +7,7 @@
  */
 const crypto = require('crypto');
 const { decodeBin } = require('@base32h/base32h');
-const { explode } = require('@theroyalwhee0/snowman');
+const { explodeId } = require('@theroyalwhee0/snowman');
 const { describe, it, expect } = require('./testing');
 const { identGenerator } = require('../src/index');
 const {
@@ -101,7 +101,7 @@ describe('@theroyalwhee0/ident', () => {
       start = end; end += SIGN_SIZE;
       const sign  = buffer.slice(start, end);
       // Check ID.
-      const [ timestamp, node, sequence, isValid ] = explode(id);
+      const [ timestamp, node, sequence, isValid ] = explodeId(id);
       expect(isValid).to.be.true;
       expect(timestamp).to.be.a('number');
       expect(node).to.equal(0);
@@ -144,7 +144,7 @@ describe('@theroyalwhee0/ident', () => {
         start = end; end += SIGN_SIZE;
         const sign  = buffer.slice(start, end);
         // Check ID.
-        const [ timestamp, node, sequence, isValid ] = explode(id);
+        const [ timestamp, node, sequence, isValid ] = explodeId(id);
         expect(isValid).to.be.true;
         expect(timestamp).to.be.a('number');
         expect(node).to.equal(0);
@@ -198,7 +198,7 @@ describe('@theroyalwhee0/ident', () => {
       start = end; end += SIGN_SIZE;
       const sign  = buffer.slice(start, end);
       // Check ID.
-      const [ timestamp, node, sequence, isValid ] = explode(id);
+      const [ timestamp, node, sequence, isValid ] = explodeId(id);
       expect(isValid).to.be.true;
       expect(timestamp).to.be.a('number');
       expect(node).to.equal(0);
@@ -249,7 +249,7 @@ describe('@theroyalwhee0/ident', () => {
       start = end; end += SIGN_SIZE;
       const sign  = buffer.slice(start, end);
       // Check ID.
-      const [ timestamp, node, sequence, isValid ] = explode(id);
+      const [ timestamp, node, sequence, isValid ] = explodeId(id);
       expect(isValid).to.be.true;
       expect(timestamp).to.be.a('number');
       expect(node).to.equal(1023);

@@ -6,7 +6,6 @@
  * Imports.
  */
 const chai = require('chai');
-const sinon = require('sinon');
 
 /**
  * Export mocha parts so that autocomplete isn't confused.
@@ -19,11 +18,6 @@ const { describe, it } = global;
 const { expect } = chai;
 
 /**
- * Sinon.
- */
-const { spy } = sinon;
-
-/**
  * Exports.
  */
 module.exports = {
@@ -31,6 +25,4 @@ module.exports = {
   describe, it,
   // Chai.
   expect,
-  // Sinon.
-  spy,
 };
