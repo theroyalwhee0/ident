@@ -1,7 +1,7 @@
 # @theroyalwhee0/ident
 
 ## A Unique Identity/Token Generator for Node
-Generates unique non-predictable collision-resistant identifiers.
+Generates unique non-predictable distributed identifiers.
 It is built from a combination of a [snowflake ID](https://github.com/theroyalwhee0/snowman/), random bytes, and two partial HMACs. It is encoded using [base32h](https://base32h.github.io/).
 
 
