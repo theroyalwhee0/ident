@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@base32h/base32h": "1.0.1",
-    "@theroyalwhee0/snowman": "0.0.4"
+    "@theroyalwhee0/snowman": "0.0.5"
   },
   "scripts": {
     "test": "mocha --sort --recursive --check-leaks",
