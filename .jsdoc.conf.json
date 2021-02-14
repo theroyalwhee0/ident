@@ -1,0 +1,16 @@
+{
+  "opts": {
+    "pedantic": true,
+    "recurse": true,
+    "readme": "README.md",
+    "destination": "docs/"
+  },
+  "source": {
+    "include": [ "src/" ]
+  },
+  "templates": {
+    "default": {
+        "includeDate": false
+    }
+  }
+}
