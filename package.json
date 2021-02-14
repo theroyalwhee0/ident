@@ -1,6 +1,6 @@
 {
   "name": "@theroyalwhee0/ident",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Unique Identity/Token Generator",
   "main": "src/index.js",
   "author": "Adam Mill <hismajesty@theroyalwhee.com> (https://www.theroyalwhee.com)",

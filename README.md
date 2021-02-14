@@ -47,6 +47,9 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## History
+- v1.0.4 - 2021-02-14
+  - Bump version of snowman.
+  - Remove dates from documentation.
 - v1.0.3 - 2021-02-06
   - Bump version of snowman.
 - v1.0.2 - 2021-02-04
