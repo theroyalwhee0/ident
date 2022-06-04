@@ -1,6 +1,6 @@
 {
   "name": "@theroyalwhee0/ident",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Unique Identity/Token Generator",
   "main": "src/index.js",
   "author": "Adam Mill <hismajesty@theroyalwhee.com> (https://www.theroyalwhee.com)",
@@ -23,21 +23,21 @@
   },
   "homepage": "https://github.com/theroyalwhee0/ident#readme",
   "devDependencies": {
-    "chai": "4.2.0",
-    "debug": "4.3.1",
-    "eslint": "7.17.0",
-    "jsdoc": "3.6.6",
-    "mocha": "8.2.1"
+    "chai": "4.3.6",
+    "eslint": "8.17.0",
+    "jsdoc": "3.6.10",
+    "mocha": "10.0.0"
   },
   "dependencies": {
     "@base32h/base32h": "1.0.1",
-    "@theroyalwhee0/snowman": "0.0.6"
+    "@theroyalwhee0/snowman": "1.0.0"
   },
   "scripts": {
     "test": "mocha --sort --recursive --check-leaks",
     "test-watch": "mocha --watch --reporter=dot --sort --recursive --check-leaks",
     "lint": "eslint src/ test/",
     "docs": "jsdoc -c .jsdoc.conf.json",
-    "dryrun": "npm test && npm run lint && npm run docs && npm audit && npm publish --dry-run"
+    "dryrun": "npm test && npm run lint && npm run docs && npm audit && npm publish --dry-run",
+    "audit-prod": "npm audit --omit dev --omit optional"
   }
 }
