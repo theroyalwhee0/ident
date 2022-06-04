@@ -6,11 +6,11 @@ It is built from a combination of a [snowflake ID](https://github.com/theroyalwh
 
 
 ## Installation
-npm install @theroyalwhee0/ident
+`npm install @theroyalwhee0/ident`
 
 *or*
 
-yarn add @theroyalwhee0/ident
+`yarn add @theroyalwhee0/ident`
 
 
 ## Documentation
@@ -47,6 +47,8 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## History
+- v1.0.5 - 2022-06-02
+  - Bump depends for security.
 - v1.0.4 - 2021-02-14
   - Bump version of snowman.
   - Remove dates from documentation.
@@ -65,6 +67,6 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## Legal & License
-Copyright 2020-2021 Adam Mill
+Copyright 2020-2022 Adam Mill
 
 This library is released under Apache 2 license. See [LICENSE](https://github.com/theroyalwhee0/ident/blob/master/LICENSE) for more details.
