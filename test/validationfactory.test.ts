@@ -1,17 +1,11 @@
-/**
- * @theroyalwhee0/ident:test/index.spec.js
- */
-
-/**
- * Imports.
- */
-const { describe, it, expect } = require('./testing');
-const {
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import {
   validationFactory,
   validationSignFactory,
   validationVerifyFactory,
   validationBothFactory,
-} = require('../src/index');
+} from '../src/index';
 
 /**
  * Test constants.

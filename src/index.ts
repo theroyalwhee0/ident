@@ -1,8 +1,7 @@
 /**
- * @file A Unique Identity/Token Generator for Node
- * @version v1.0.4
+ * @file A Unique Identifier Generator for Node
  * @author Adam Mill <hismajesty@theroyalwhee.com>
- * @copyright Copyright 2021 Adam Mill
+ * @copyright Copyright 2021-2022 Adam Mill
  * @license Apache-2.0
  */
 
@@ -10,22 +9,33 @@
  * Imports.
  * @private
  */
-const crypto = require('crypto');
-const { isString } = require('@theroyalwhee0/istype');
-const { idSequence, explodeId } = require('@theroyalwhee0/snowman');
-const { decodeBin, encodeBin } = require('@base32h/base32h');
-const {
+import crypto from 'node:crypto';
+import { isString } from '@theroyalwhee0/istype';
+import { idSequence, explodeId, SequenceOptions } from '@theroyalwhee0/snowman';
+import { decodeBin, encodeBin } from '@base32h/base32h';
+import {
   HMAC_ALGO,
   ALL_SIZE, ID_SIZE, RND_SIZE, VERIFY_SIZE, SIGN_SIZE,
   re_lax,
-} = require('./constants');
+} from './constants';
 
 /**
  * Default Options.
  * @private
  */
 const defaultOptions = {
-  getRandomBytes: (size) => crypto.randomBytes(size),
+  getRandomBytes: (size:number) => crypto.randomBytes(size),
+};
+
+/**
+ * Ident options.
+ */
+export type IdentOptions = {
+  signKey: string,
+  node?: number,
+  verifyKey?: string,
+  idOptions?: SequenceOptions
+  getRandomBytes?: (size:number) => Buffer,
 };
 
 /**
@@ -34,7 +44,7 @@ const defaultOptions = {
  * @param {object} options The options.
  * @returns {object} The merged/modified options.
  */
-function buildOptions(options) {
+function buildOptions(options:IdentOptions):IdentOptions {
   const built = Object.assign({}, defaultOptions, options);
   const idOptions = Object.assign({}, built.idOptions);
   built.idOptions = idOptions;
@@ -56,10 +66,10 @@ function buildOptions(options) {
  * @param {object} options.idOptions Options passed to snowman.
  * @yields {string} The created ident.
  */
-function* identGenerator(options) {
+export function* identGenerator(options:IdentOptions) {
   options = buildOptions(options);
   const { verifyKey, signKey, getRandomBytes } = options;
-  const ids = idSequence(options.idOptions);
+  const ids = idSequence(options.idOptions) as Generator<bigint, bigint, void>;
   while(1) {
     // Create the buffer.
     const buffer = Buffer.alloc(ALL_SIZE, 0);
@@ -95,7 +105,7 @@ function* identGenerator(options) {
  * @param {number} byte The byte value to trim. Defaults to zero.
  * @returns {Buffer} The trimmed buffer.
  */
-function leftTrimBuffer(buffer, byte=0) {
+function leftTrimBuffer(buffer:Buffer, byte=0) {
   let idx;
   for(idx=0; idx < buffer.length; idx++) {
     if(buffer[idx] !== byte) {
@@ -114,10 +124,10 @@ function leftTrimBuffer(buffer, byte=0) {
  * @param {string} options.verifyKey The key to use for verify check.
  * @returns True if valid, false if not.
  */
-function validationFactory(options) {
+export function validationFactory(options?:IdentOptions) {
   options = buildOptions(options);
   const { verifyKey, signKey } = options;
-  return function validation(value) {
+  return function validation(value:string) {
     if(!isString(value) || !re_lax.test(value)) {
       return false;
     }
@@ -168,8 +178,8 @@ function validationFactory(options) {
  * @param {string} options.signKey The key to use for signing check.
  * @returns {boolean} True if valid, false if not.
  */
-function validationSignFactory(options) {
-  if(!(options && options.signKey)) {
+export function validationSignFactory(options?:IdentOptions) {
+  if(!options?.signKey) {
     throw new Error('signKey is required.');
   }
   return validationFactory(options);
@@ -181,8 +191,8 @@ function validationSignFactory(options) {
  * @param {string} options.verifyKey The key to use for verify check.
  * @returns {boolean} True if valid, false if not.
  */
-function validationVerifyFactory(options) {
-  if(!(options && options.verifyKey)) {
+export function validationVerifyFactory(options?:IdentOptions) {
+  if(!options?.verifyKey) {
     throw new Error('verifyKey is required.');
   }
   return validationFactory(options);
@@ -195,23 +205,12 @@ function validationVerifyFactory(options) {
  * @param {string} options.verifyKey The key to use for verify check.
  * @returns {boolean} True if valid, false if not.
  */
-function validationBothFactory(options) {
-  if(!(options && options.signKey)) {
+export function validationBothFactory(options?:IdentOptions) {
+  if(!options?.signKey) {
     throw new Error('signKey is required.');
   }
-  if(!(options && options.verifyKey)) {
+  if(!options?.verifyKey) {
     throw new Error('verifyKey is required.');
   }
   return validationFactory(options);
 }
-
-/**
- * Exports.
- */
-module.exports = {
-  identGenerator,
-  validationFactory,
-  validationSignFactory,
-  validationVerifyFactory,
-  validationBothFactory,
-};

@@ -6,7 +6,7 @@
     "destination": "docs/"
   },
   "source": {
-    "include": [ "src/" ]
+    "include": [ "dist/" ]
   },
   "templates": {
     "default": {
