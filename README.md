@@ -1,6 +1,6 @@
 # @theroyalwhee0/ident
 
-## A Unique Identity/Token Generator for Node
+## A Unique Identifier Generator for Node
 Generates unique non-predictable distributed identifiers.
 It is built from a combination of a [snowflake ID](https://github.com/theroyalwhee0/snowman/), random bytes, and two partial HMACs. It is encoded using [base32h](https://base32h.github.io/).
 
@@ -20,7 +20,7 @@ The identGenerator() function creates a iterable sequence of tokens. The validat
 
 
 ## Usage
-```
+```js
 const { identGenerator, validationBothFactory } = require('@theroyalwhee0/ident');
 const verifyKey = 'bird';
 const signKey = 'seed';
@@ -47,6 +47,10 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## History
+- v1.1.0  - 2022-09-06
+  - Change to TypeScript.
+  - Fix deprecations.
+  - Move testing to Mocha.
 - v1.0.5 - 2022-06-02
   - Bump depends for security.
 - v1.0.4 - 2021-02-14
@@ -67,6 +71,6 @@ Running ```npm run test``` will run the test suite under Mocha. Running ```npm r
 
 
 ## Legal & License
-Copyright 2020-2022 Adam Mill
+Copyright 2021-2022 Adam Mill
 
 This library is released under Apache 2 license. See [LICENSE](https://github.com/theroyalwhee0/ident/blob/master/LICENSE) for more details.

@@ -26,36 +26,34 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @file A Unique Identity/Token Generator for Node
- * @version v1.0.4
+            <pre class="prettyprint source linenums"><code>"use strict";
+/**
+ * @file A Unique Identifier Generator for Node
  * @author Adam Mill &lt;hismajesty@theroyalwhee.com>
- * @copyright Copyright 2021 Adam Mill
+ * @copyright Copyright 2021-2022 Adam Mill
  * @license Apache-2.0
  */
-
+var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
+    return (mod &amp;&amp; mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.validationBothFactory = exports.validationVerifyFactory = exports.validationSignFactory = exports.validationFactory = exports.identGenerator = void 0;
 /**
  * Imports.
  * @private
  */
-const crypto = require('crypto');
-const { isString } = require('@theroyalwhee0/istype');
-const { idSequence, explodeId } = require('@theroyalwhee0/snowman');
-const { decodeBin, encodeBin } = require('@base32h/base32h');
-const {
-  HMAC_ALGO,
-  ALL_SIZE, ID_SIZE, RND_SIZE, VERIFY_SIZE, SIGN_SIZE,
-  re_lax,
-} = require('./constants');
-
+const node_crypto_1 = __importDefault(require("node:crypto"));
+const istype_1 = require("@theroyalwhee0/istype");
+const snowman_1 = require("@theroyalwhee0/snowman");
+const base32h_1 = require("@base32h/base32h");
+const constants_1 = require("./constants");
 /**
  * Default Options.
  * @private
  */
 const defaultOptions = {
-  getRandomBytes: (size) => crypto.randomBytes(size),
+    getRandomBytes: (size) => node_crypto_1.default.randomBytes(size),
 };
-
 /**
  * Build options from options and defaults.
  * @private
@@ -63,15 +61,14 @@ const defaultOptions = {
  * @returns {object} The merged/modified options.
  */
 function buildOptions(options) {
-  const built = Object.assign({}, defaultOptions, options);
-  const idOptions = Object.assign({}, built.idOptions);
-  built.idOptions = idOptions;
-  if('node' in built) {
-    idOptions.node = built.node;
-  }
-  return built;
+    const built = Object.assign({}, defaultOptions, options);
+    const idOptions = Object.assign({}, built.idOptions);
+    built.idOptions = idOptions;
+    if ('node' in built) {
+        idOptions.node = built.node;
+    }
+    return built;
 }
-
 /**
  * identGenerator
  * @generator
@@ -85,37 +82,37 @@ function buildOptions(options) {
  * @yields {string} The created ident.
  */
 function* identGenerator(options) {
-  options = buildOptions(options);
-  const { verifyKey, signKey, getRandomBytes } = options;
-  const ids = idSequence(options.idOptions);
-  while(1) {
-    // Create the buffer.
-    const buffer = Buffer.alloc(ALL_SIZE, 0);
-    // Add the id.
-    const { value: id, done } = ids.next();
-    if(done) {
-      throw new Error(`id sequence should never be done.`);
+    options = buildOptions(options);
+    const { verifyKey, signKey, getRandomBytes } = options;
+    const ids = (0, snowman_1.idSequence)(options.idOptions);
+    while (1) {
+        // Create the buffer.
+        const buffer = Buffer.alloc(constants_1.ALL_SIZE, 0);
+        // Add the id.
+        const { value: id, done } = ids.next();
+        if (done) {
+            throw new Error(`id sequence should never be done.`);
+        }
+        buffer.writeBigUInt64BE(id, 0);
+        // Add the random bytes.
+        const rnd = getRandomBytes(constants_1.RND_SIZE);
+        rnd.copy(buffer, constants_1.ID_SIZE, 0, constants_1.RND_SIZE);
+        // Add verification hmac.
+        const verifyBuffer = buffer.slice(0, constants_1.ID_SIZE + constants_1.RND_SIZE);
+        const hmacVerify = node_crypto_1.default.createHmac(constants_1.HMAC_ALGO, verifyKey);
+        const verify = hmacVerify.update(verifyBuffer).digest();
+        verify.copy(buffer, constants_1.ID_SIZE + constants_1.RND_SIZE, 0, constants_1.VERIFY_SIZE);
+        // Add signature hmac.
+        const signBuffer = buffer.slice(0, constants_1.ID_SIZE + constants_1.RND_SIZE + constants_1.VERIFY_SIZE);
+        const hmacSign = node_crypto_1.default.createHmac(constants_1.HMAC_ALGO, signKey);
+        const sign = hmacSign.update(signBuffer).digest();
+        sign.copy(buffer, constants_1.ID_SIZE + constants_1.RND_SIZE + constants_1.VERIFY_SIZE, 0, constants_1.SIGN_SIZE);
+        // Encode buffer and strip leading zeros.
+        const ident = (0, base32h_1.encodeBin)(buffer).replace(/^0+/, '');
+        yield ident;
     }
-    buffer.writeBigUInt64BE(id, 0);
-    // Add the random bytes.
-    const rnd = getRandomBytes(RND_SIZE);
-    rnd.copy(buffer, ID_SIZE, 0, RND_SIZE);
-    // Add verification hmac.
-    const verifyBuffer = buffer.slice(0, ID_SIZE+RND_SIZE);
-    const hmacVerify = crypto.createHmac(HMAC_ALGO, verifyKey);
-    const verify = hmacVerify.update(verifyBuffer).digest();
-    verify.copy(buffer, ID_SIZE+RND_SIZE, 0, VERIFY_SIZE);
-    // Add signature hmac.
-    const signBuffer = buffer.slice(0, ID_SIZE+RND_SIZE+VERIFY_SIZE);
-    const hmacSign = crypto.createHmac(HMAC_ALGO, signKey);
-    const sign = hmacSign.update(signBuffer).digest();
-    sign.copy(buffer, ID_SIZE+RND_SIZE+VERIFY_SIZE, 0, SIGN_SIZE);
-    // Encode buffer and strip leading zeros.
-    const ident = encodeBin(buffer).replace(/^0+/, '');
-    yield ident;
-  }
 }
-
+exports.identGenerator = identGenerator;
 /**
  * Left trim buffer.
  * @private
@@ -123,16 +120,15 @@ function* identGenerator(options) {
  * @param {number} byte The byte value to trim. Defaults to zero.
  * @returns {Buffer} The trimmed buffer.
  */
-function leftTrimBuffer(buffer, byte=0) {
-  let idx;
-  for(idx=0; idx &lt; buffer.length; idx++) {
-    if(buffer[idx] !== byte) {
-      break;
+function leftTrimBuffer(buffer, byte = 0) {
+    let idx;
+    for (idx = 0; idx &lt; buffer.length; idx++) {
+        if (buffer[idx] !== byte) {
+            break;
+        }
     }
-  }
-  return idx === 0 ? buffer : buffer.slice(idx);
+    return idx === 0 ? buffer : buffer.slice(idx);
 }
-
 /**
  * Low-level validation factory.
  * Use validationVerifyFactory, validationSignFactory, or
@@ -143,53 +139,56 @@ function leftTrimBuffer(buffer, byte=0) {
  * @returns True if valid, false if not.
  */
 function validationFactory(options) {
-  options = buildOptions(options);
-  const { verifyKey, signKey } = options;
-  return function validation(value) {
-    if(!isString(value) || !re_lax.test(value)) {
-      return false;
-    }
-    const decoded = leftTrimBuffer(Buffer.from(decodeBin(value)));
-    const buffer = decoded.length &lt; ALL_SIZE ?
-      Buffer.concat([ Buffer.alloc(ALL_SIZE-decoded.length, 0), decoded ])
-      : decoded;
-    if(buffer.length !== ALL_SIZE) {
-      return false;
-    }
-    let start = 0, end = ID_SIZE;
-    const id = buffer.readBigUInt64BE();
-    // Check ID.
-    const [ ,,, idValid ] = explodeId(id);
-    if(!idValid) {
-      return false;
-    }
-    start = end; end += RND_SIZE;
-    start = end; end += VERIFY_SIZE;
-    const verify = buffer.slice(start, end);
-    start = end; end += SIGN_SIZE;
-    const sign = buffer.slice(start, end);
-    if(verifyKey) {
-      // Check verify hmac if given verify key...
-      const hmacVerify = crypto.createHmac(HMAC_ALGO, verifyKey);
-      const verifyBuffer = buffer.slice(0, ID_SIZE+RND_SIZE);
-      const verifyCheck = hmacVerify.update(verifyBuffer).digest().slice(0, VERIFY_SIZE);
-      if(!crypto.timingSafeEqual(verify, verifyCheck)) {
-        return false;
-      }
-    }
-    if(signKey) {
-      // Check sign hmac if given sign key...
-      const hmacSign = crypto.createHmac(HMAC_ALGO, signKey);
-      const signBuffer = buffer.slice(0, ID_SIZE+RND_SIZE+VERIFY_SIZE);
-      const signCheck = hmacSign.update(signBuffer).digest().slice(0, SIGN_SIZE);
-      if(!crypto.timingSafeEqual(sign, signCheck)) {
-        return false;
-      }
-    }
-    return true;
-  };
+    options = buildOptions(options);
+    const { verifyKey, signKey } = options;
+    return function validation(value) {
+        if (!(0, istype_1.isString)(value) || !constants_1.re_lax.test(value)) {
+            return false;
+        }
+        const decoded = leftTrimBuffer(Buffer.from((0, base32h_1.decodeBin)(value)));
+        const buffer = decoded.length &lt; constants_1.ALL_SIZE ?
+            Buffer.concat([Buffer.alloc(constants_1.ALL_SIZE - decoded.length, 0), decoded])
+            : decoded;
+        if (buffer.length !== constants_1.ALL_SIZE) {
+            return false;
+        }
+        let start = 0, end = constants_1.ID_SIZE;
+        const id = buffer.readBigUInt64BE();
+        // Check ID.
+        const [, , , idValid] = (0, snowman_1.explodeId)(id);
+        if (!idValid) {
+            return false;
+        }
+        start = end;
+        end += constants_1.RND_SIZE;
+        start = end;
+        end += constants_1.VERIFY_SIZE;
+        const verify = buffer.slice(start, end);
+        start = end;
+        end += constants_1.SIGN_SIZE;
+        const sign = buffer.slice(start, end);
+        if (verifyKey) {
+            // Check verify hmac if given verify key...
+            const hmacVerify = node_crypto_1.default.createHmac(constants_1.HMAC_ALGO, verifyKey);
+            const verifyBuffer = buffer.slice(0, constants_1.ID_SIZE + constants_1.RND_SIZE);
+            const verifyCheck = hmacVerify.update(verifyBuffer).digest().slice(0, constants_1.VERIFY_SIZE);
+            if (!node_crypto_1.default.timingSafeEqual(verify, verifyCheck)) {
+                return false;
+            }
+        }
+        if (signKey) {
+            // Check sign hmac if given sign key...
+            const hmacSign = node_crypto_1.default.createHmac(constants_1.HMAC_ALGO, signKey);
+            const signBuffer = buffer.slice(0, constants_1.ID_SIZE + constants_1.RND_SIZE + constants_1.VERIFY_SIZE);
+            const signCheck = hmacSign.update(signBuffer).digest().slice(0, constants_1.SIGN_SIZE);
+            if (!node_crypto_1.default.timingSafeEqual(sign, signCheck)) {
+                return false;
+            }
+        }
+        return true;
+    };
 }
-
+exports.validationFactory = validationFactory;
 /**
  * Validation factory requring a signKey.
  * @param {object} options Options.
@@ -197,12 +196,12 @@ function validationFactory(options) {
  * @returns {boolean} True if valid, false if not.
  */
 function validationSignFactory(options) {
-  if(!(options &amp;&amp; options.signKey)) {
-    throw new Error('signKey is required.');
-  }
-  return validationFactory(options);
+    if (!options?.signKey) {
+        throw new Error('signKey is required.');
+    }
+    return validationFactory(options);
 }
-
+exports.validationSignFactory = validationSignFactory;
 /**
  * Validation factory requring a verifyKey.
  * @param {object} options Options.
@@ -210,12 +209,12 @@ function validationSignFactory(options) {
  * @returns {boolean} True if valid, false if not.
  */
 function validationVerifyFactory(options) {
-  if(!(options &amp;&amp; options.verifyKey)) {
-    throw new Error('verifyKey is required.');
-  }
-  return validationFactory(options);
+    if (!options?.verifyKey) {
+        throw new Error('verifyKey is required.');
+    }
+    return validationFactory(options);
 }
-
+exports.validationVerifyFactory = validationVerifyFactory;
 /**
  * Validation factory requring both keys.
  * @param {object} options Options.
@@ -224,26 +223,16 @@ function validationVerifyFactory(options) {
  * @returns {boolean} True if valid, false if not.
  */
 function validationBothFactory(options) {
-  if(!(options &amp;&amp; options.signKey)) {
-    throw new Error('signKey is required.');
-  }
-  if(!(options &amp;&amp; options.verifyKey)) {
-    throw new Error('verifyKey is required.');
-  }
-  return validationFactory(options);
+    if (!options?.signKey) {
+        throw new Error('signKey is required.');
+    }
+    if (!options?.verifyKey) {
+        throw new Error('verifyKey is required.');
+    }
+    return validationFactory(options);
 }
-
-/**
- * Exports.
- */
-module.exports = {
-  identGenerator,
-  validationFactory,
-  validationSignFactory,
-  validationVerifyFactory,
-  validationBothFactory,
-};
-</code></pre>
+exports.validationBothFactory = validationBothFactory;
+//# sourceMappingURL=index.js.map</code></pre>
         </article>
     </section>
 
@@ -259,7 +248,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a>
 </footer>
 
 <script> prettyPrint(); </script>

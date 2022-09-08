@@ -1,2 +1,5 @@
+.github/
+.env
+.npmrc
 docs/
-.jsdoc.conf.json
+tsconfig.tsbuildinfo

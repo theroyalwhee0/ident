@@ -1,19 +1,13 @@
-/**
- * @theroyalwhee0/ident:test/index.spec.js
- */
-
-/**
- * Imports.
- */
-const crypto = require('crypto');
-const { decodeBin } = require('@base32h/base32h');
-const { explodeId } = require('@theroyalwhee0/snowman');
-const { describe, it, expect } = require('./testing');
-const { identGenerator } = require('../src/index');
-const {
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import crypto from 'node:crypto';
+import  { decodeBin } from '@base32h/base32h';
+import  { explodeId } from '@theroyalwhee0/snowman';
+import  { identGenerator } from '../src/index';
+import  {
   HMAC_ALGO,
   ALL_SIZE, ID_SIZE, RND_SIZE, VERIFY_SIZE, SIGN_SIZE,
-} = require('../src/constants');
+} from '../src/constants';
 
 /**
  * Test constants.
@@ -31,7 +25,7 @@ const signKey3   = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ';
 /**
  * Left Pad Buffer.
  */
-function leftPadBuffer(buffer, size, value=0) {
+function leftPadBuffer(buffer:Buffer, size:number, value=0):Buffer {
   if(buffer.length >= size) {
     return buffer;
   }
@@ -44,7 +38,7 @@ function leftPadBuffer(buffer, size, value=0) {
 /**
  * Left trim buffer.
  */
-function leftTrimBuffer(buffer, value=0) {
+function leftTrimBuffer(buffer:Buffer, value=0):Buffer {
   let idx;
   for(idx=0; idx < buffer.length; idx++) {
     if(buffer[idx] !== value) {
@@ -88,7 +82,7 @@ describe('@theroyalwhee0/ident', () => {
       expect(done).to.equal(false);
       expect(value).to.match(/^[123456789ABCDEFGHJKLMNPQRTVWXYZ][0123456789ABCDEFGHJKLMNPQRTVWXYZ]+$/);
       // Decode values.
-      const decoded = Buffer.from(decodeBin(value));
+      const decoded = Buffer.from(decodeBin(value as string));
       const trimmed = leftTrimBuffer(decoded, 0);
       expect(trimmed.length).to.be.lte(ALL_SIZE);
       const buffer = leftPadBuffer(trimmed, ALL_SIZE);
@@ -123,7 +117,7 @@ describe('@theroyalwhee0/ident', () => {
         signKey: signKey1, verifyKey: verifyKey1,
       });
       for(let idx=0; idx < 2000; idx++) {
-        const { value, done } = it.next();
+        const { value, done } = it.next() as {value:string, done:boolean };
         expect(done).to.equal(false);
         expect(value).to.be.a('string');
         expect(value).to.match(/^[123456789ABCDEFGHJKLMNPQRTVWXYZ][0123456789ABCDEFGHJKLMNPQRTVWXYZ]+$/);
@@ -180,7 +174,7 @@ describe('@theroyalwhee0/ident', () => {
           },
         },
       });
-      const { value, done } = it.next();
+      const { value, done } = it.next() as {value:string, done:boolean };
       expect(value).to.be.a('string');
       expect(done).to.equal(false);
       expect(value).to.match(/^[123456789ABCDEFGHJKLMNPQRTVWXYZ][0123456789ABCDEFGHJKLMNPQRTVWXYZ]+$/);
@@ -231,7 +225,7 @@ describe('@theroyalwhee0/ident', () => {
           },
         },
       });
-      const { value, done } = it.next();
+      const { value, done } = it.next() as {value:string, done:boolean };
       expect(value).to.be.a('string');
       expect(done).to.equal(false);
       expect(value).to.match(/^[123456789ABCDEFGHJKLMNPQRTVWXYZ][0123456789ABCDEFGHJKLMNPQRTVWXYZ]+$/);

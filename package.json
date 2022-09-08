@@ -1,11 +1,13 @@
 {
   "name": "@theroyalwhee0/ident",
-  "version": "1.0.5",
-  "description": "Unique Identity/Token Generator",
-  "main": "src/index.js",
+  "version": "1.1.0",
+  "description": "Unique Identifier Generator",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
   "author": "Adam Mill <hismajesty@theroyalwhee.com> (https://www.theroyalwhee.com)",
   "license": "Apache-2.0",
   "keywords": [
+    "unique",
     "token",
     "ident",
     "identifier"
@@ -23,21 +25,34 @@
   },
   "homepage": "https://github.com/theroyalwhee0/ident#readme",
   "devDependencies": {
+    "@types/chai": "4.3.3",
+    "@types/mocha": "9.1.1",
+    "@types/node": "18.7.15",
+    "@types/sinon": "10.0.13",
+    "@typescript-eslint/eslint-plugin": "5.36.2",
+    "@typescript-eslint/parser": "5.36.2",
     "chai": "4.3.6",
-    "eslint": "8.17.0",
-    "jsdoc": "3.6.10",
-    "mocha": "10.0.0"
+    "eslint": "8.23.0",
+    "jsdoc": "3.6.11",
+    "mocha": "10.0.0",
+    "sinon": "14.0.0",
+    "ts-node": "10.9.1",
+    "typescript": "4.8.2"
   },
   "dependencies": {
     "@base32h/base32h": "1.0.1",
     "@theroyalwhee0/snowman": "1.0.0"
   },
   "scripts": {
-    "test": "mocha --sort --recursive --check-leaks",
-    "test-watch": "mocha --watch --reporter=dot --sort --recursive --check-leaks",
-    "lint": "eslint src/ test/",
-    "docs": "jsdoc -c .jsdoc.conf.json",
-    "dryrun": "npm test && npm run lint && npm run docs && npm audit && npm publish --dry-run",
-    "audit-prod": "npm audit --omit dev --omit optional"
+    "build": "tsc",
+    "rebuild": "npm run clean && tsc --build --force && npm run docs",
+    "clean": "mkdir -p ./dist && [ ! -z \"$(find ./dist/ -maxdepth 1 -type f -print -quit)\" ] && rm -R ./dist/*; true",
+    "watch": "npm run build && tsc --watch",
+    "lint": "eslint .",
+    "test": "mocha --require ts-node/register test/**/*.test.ts",
+    "test-watch": "mocha --reporter dot --watch --watch-files test/**/*.test.ts --watch-files src/**/*.ts --require ts-node/register test/**/*.test.ts",
+    "dryrun": "npm prune && npm audit && npm run rebuild && npm run lint && npm test && npm publish --dry-run",
+    "audit": "npm audit --omit dev",
+    "docs": "jsdoc -c .jsdoc.conf.json"
   }
 }
